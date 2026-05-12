@@ -228,6 +228,15 @@ function showGameOver() {
     <button onclick="startGame()">ЕЩЁ РАЗ</button>
   `;
   ov.style.display = "flex";
+  async function submitScore(score) {
+  const initData = window.Telegram?.WebApp?.initData;
+  if (!initData) return;
+  await fetch("https://f141608d-1c6f-48a7-b475-76bfe617af45-00-bg39mkj1p2mv.sisko.replit.dev/api/score", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ init_data: initData, score: score }),
+  });
+}
 }
 
 function setDir(dx, dy) {
