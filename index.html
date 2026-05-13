@@ -21,15 +21,35 @@
       user-select: none;
     }
 
+    #tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 10px;
+    }
+    #tabs button {
+      flex: 1;
+      padding: 6px 20px;
+      background: #111;
+      border: 2px solid #0f0;
+      color: #0f0;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    #tabs button:first-child { border-radius: 6px 0 0 6px; border-right: none; }
+    #tabs button:last-child  { border-radius: 0 6px 6px 0; }
+    #tabs button.active { background: #0f0; color: #000; font-weight: bold; }
+
     #scoreboard {
       display: flex;
       gap: 32px;
-      margin-bottom: 12px;
-      font-size: 14px;
+      margin-bottom: 10px;
+      font-size: 13px;
       letter-spacing: 2px;
     }
-
-    #scoreboard span { color: #fff; font-size: 18px; font-weight: bold; }
+    #scoreboard span { color: #fff; font-size: 16px; font-weight: bold; }
 
     canvas {
       background: #111;
@@ -41,75 +61,101 @@
     #dpad {
       display: grid;
       grid-template-areas: ". up ." "left . right" ". down .";
-      gap: 6px;
-      margin-top: 16px;
+      gap: 8px;
+      margin-top: 14px;
     }
-
     #dpad button {
-      width: 56px;
-      height: 56px;
-      background: #111;
-      border: 2px solid #0f0;
-      color: #0f0;
-      font-size: 22px;
+      width: 68px; height: 68px;
+      background: #0d1f0d;
+      border: 2px solid #00cc44;
+      color: #00ff66;
+      font-size: 26px;
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 14px;
       -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 0 8px rgba(0,255,80,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: background 0.08s, box-shadow 0.08s;
     }
-
-    #dpad button:active { background: #0f0; color: #000; }
+    #dpad button:active {
+      background: #00cc44;
+      color: #000;
+      box-shadow: 0 0 18px rgba(0,255,80,0.55);
+    }
     #dpad button[data-d="up"]    { grid-area: up; }
     #dpad button[data-d="left"]  { grid-area: left; }
     #dpad button[data-d="right"] { grid-area: right; }
     #dpad button[data-d="down"]  { grid-area: down; }
 
     #overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.82);
-      display: flex;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px;
+    }
+    #overlay h1 { font-size: 34px; color: #0f0; letter-spacing: 4px; }
+    #overlay .sub { font-size: 18px; color: #fff; }
+    #overlay .rec { font-size: 14px; color: #ff0; }
+    #overlay button {
+      margin-top: 6px; padding: 12px 36px;
+      background: #0f0; color: #000; border: none;
+      font-size: 17px; font-family: inherit; font-weight: bold;
+      letter-spacing: 2px; cursor: pointer; border-radius: 6px;
+    }
+    #overlay button:active { opacity: 0.8; }
+
+    #lb-panel {
+      display: none;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 14px;
+      width: 100%;
+      max-width: 340px;
+      gap: 6px;
     }
-
-    #overlay h1 { font-size: 36px; color: #0f0; letter-spacing: 4px; }
-    #overlay .sub { font-size: 20px; color: #fff; }
-    #overlay .rec { font-size: 15px; color: #ff0; }
-
-    #overlay button {
-      margin-top: 8px;
-      padding: 14px 40px;
-      background: #0f0;
-      color: #000;
-      border: none;
-      font-size: 18px;
-      font-family: inherit;
-      font-weight: bold;
-      letter-spacing: 2px;
-      cursor: pointer;
-      border-radius: 6px;
+    #lb-panel h2 { font-size: 18px; letter-spacing: 3px; margin-bottom: 4px; }
+    .lb-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 14px;
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 4px;
+      font-size: 14px;
     }
-
-    #overlay button:active { opacity: 0.8; }
+    .lb-row .lb-rank { color: #ff0; width: 28px; }
+    .lb-row .lb-name { flex: 1; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lb-row .lb-score { color: #0f0; font-weight: bold; }
+    .lb-row.lb-me { border-color: #ff0; background: #1a1a00; }
+    #lb-empty { color: #555; font-size: 14px; margin-top: 20px; }
+    #lb-loading { color: #555; font-size: 14px; }
   </style>
 </head>
 <body>
 
-<div id="scoreboard">
-  СЧЁТ:&nbsp;<span id="score">0</span>
-  &nbsp;&nbsp;
-  РЕКОРД:&nbsp;<span id="best">0</span>
+<div id="tabs">
+  <button class="active" onclick="showTab('game')">🎮 ИГРА</button>
+  <button onclick="showTab('lb')">🏅 ТОП</button>
 </div>
 
-<canvas id="game"></canvas>
+<div id="game-panel">
+  <div id="scoreboard">
+    СЧЁТ:&nbsp;<span id="score">0</span>
+    &nbsp;&nbsp;
+    РЕКОРД:&nbsp;<span id="best">0</span>
+  </div>
+  <canvas id="game"></canvas>
+  <div id="dpad">
+    <button data-d="up">▲</button>
+    <button data-d="left">◀</button>
+    <button data-d="right">▶</button>
+    <button data-d="down">▼</button>
+  </div>
+</div>
 
-<div id="dpad">
-  <button data-d="up">▲</button>
-  <button data-d="left">◀</button>
-  <button data-d="right">▶</button>
-  <button data-d="down">▼</button>
+<div id="lb-panel">
+  <h2>🏅 ТАБЛИЦА</h2>
+  <div id="lb-loading">Загрузка...</div>
 </div>
 
 <div id="overlay">
@@ -121,18 +167,82 @@
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
+// ▼▼▼ адрес твоего Replit-сервера ▼▼▼
+const API = "https://f141608d-1c6f-48a7-b475-76bfe617af45-00-bg39mkj1p2mv.sisko.replit.dev/api";
+
 const canvas = document.getElementById("game");
 const ctx    = canvas.getContext("2d");
 const COLS = 20, ROWS = 20;
 
-let CELL, loop, score, best, snake, food, dir, nextDir, alive, touchStart;
+let CELL, rafId, score, best, snake, prevSnake, food, dir, nextDir, alive, touchStart;
+let lastTickTime = 0;
+const TICK_MS = 190;
 
 best = Number(localStorage.getItem("snake_best") || 0);
 document.getElementById("best").textContent = best;
 
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+
+function showTab(tab) {
+  const tabs = document.querySelectorAll("#tabs button");
+  const gp = document.getElementById("game-panel");
+  gp.style.display = tab === "game" ? "flex" : "none";
+  gp.style.flexDirection = "column";
+  gp.style.alignItems = "center";
+  document.getElementById("lb-panel").style.display = tab === "lb" ? "flex" : "none";
+  tabs[0].classList.toggle("active", tab === "game");
+  tabs[1].classList.toggle("active", tab === "lb");
+  if (tab === "lb") loadLeaderboard();
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+
+async function loadLeaderboard() {
+  const panel = document.getElementById("lb-panel");
+  panel.innerHTML = "<h2>🏅 ТАБЛИЦА</h2><div id='lb-loading'>Загрузка...</div>";
+  try {
+    const res = await fetch(API + "/leaderboard");
+    const rows = await res.json();
+    const myId = tg?.initDataUnsafe?.user?.id;
+    panel.innerHTML = "<h2>🏅 ТАБЛИЦА</h2>";
+    if (!rows.length) {
+      panel.innerHTML += "<div id='lb-empty'>Пока никто не играл. Будь первым!</div>";
+      return;
+    }
+    const medals = ["🥇","🥈","🥉"];
+    rows.forEach(r => {
+      const isMe = myId && String(r.user_id) === String(myId);
+      const div = document.createElement("div");
+      div.className = "lb-row" + (isMe ? " lb-me" : "");
+      div.innerHTML = `
+        <span class="lb-rank">${medals[r.rank-1] || r.rank + "."}</span>
+        <span class="lb-name">${r.name}${isMe ? " ★" : ""}</span>
+        <span class="lb-score">${r.score}</span>
+      `;
+      panel.appendChild(div);
+    });
+  } catch {
+    panel.innerHTML += "<div id='lb-empty'>Не удалось загрузить</div>";
+  }
+}
+
+async function submitScore(s) {
+  const initData = tg?.initData;
+  if (!initData) return;
+  try {
+    await fetch(API + "/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ init_data: initData, score: s }),
+    });
+  } catch {}
+}
+
+// ── Canvas ────────────────────────────────────────────────────────────────────
+
 function resize() {
-  const maxW = Math.min(window.innerWidth  - 16, 400);
-  const maxH = Math.min(window.innerHeight - 200, 400);
+  const maxW = Math.min(window.innerWidth  - 16, 380);
+  const maxH = Math.min(window.innerHeight - 210, 380);
   CELL = Math.floor(Math.min(maxW, maxH) / COLS);
   canvas.width  = CELL * COLS;
   canvas.height = CELL * ROWS;
@@ -148,11 +258,10 @@ function spawnFood() {
   return { x: 0, y: 0 };
 }
 
-function drawFrame() {
-  ctx.fillStyle = "#111";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+// ── Render ────────────────────────────────────────────────────────────────────
 
-  ctx.strokeStyle = "rgba(0,255,0,0.07)";
+function drawGrid() {
+  ctx.strokeStyle = "rgba(0,255,0,0.06)";
   ctx.lineWidth = 0.5;
   for (let i = 0; i <= COLS; i++) {
     ctx.beginPath(); ctx.moveTo(i*CELL, 0); ctx.lineTo(i*CELL, canvas.height); ctx.stroke();
@@ -160,35 +269,116 @@ function drawFrame() {
   for (let j = 0; j <= ROWS; j++) {
     ctx.beginPath(); ctx.moveTo(0, j*CELL); ctx.lineTo(canvas.width, j*CELL); ctx.stroke();
   }
+}
 
-  ctx.fillStyle = "red";
-  ctx.fillRect(food.x*CELL+2, food.y*CELL+2, CELL-4, CELL-4);
+function rr(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  ctx.fill();
+}
 
-  for (let i = snake.length - 1; i >= 0; i--) {
-    const s = snake[i];
+function drawFrameInterp(t) {
+  ctx.fillStyle = "#0a0f0a";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawGrid();
+
+  // food — glowing circle
+  const fc = { x: food.x * CELL + CELL/2, y: food.y * CELL + CELL/2 };
+  const fr = CELL / 2 - 2;
+  ctx.shadowColor = "#ff2244";
+  ctx.shadowBlur  = 14;
+  ctx.fillStyle   = "#ff3355";
+  ctx.beginPath(); ctx.arc(fc.x, fc.y, fr, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur  = 0;
+  ctx.fillStyle   = "rgba(255,220,220,0.55)";
+  ctx.beginPath(); ctx.arc(fc.x - fr*0.28, fc.y - fr*0.32, fr*0.32, 0, Math.PI*2); ctx.fill();
+
+  // snake
+  const len  = snake.length;
+  const pad  = Math.max(1, CELL * 0.08);
+  const brad = Math.max(3, CELL * 0.28);
+  ctx.shadowBlur = 0;
+
+  for (let i = len - 1; i >= 0; i--) {
+    const curr = snake[i];
+    const prev = prevSnake[i] || curr;
+    const px = (prev.x + (curr.x - prev.x) * t) * CELL + pad;
+    const py = (prev.y + (curr.y - prev.y) * t) * CELL + pad;
+    const sw = CELL - pad * 2;
+
     if (i === 0) {
-      ctx.fillStyle = alive ? "#00ff88" : "#ff4444";
+      ctx.shadowColor = alive ? "#00ff88" : "#ff4444";
+      ctx.shadowBlur  = alive ? 12 : 10;
+      ctx.fillStyle   = alive ? "#00ff88" : "#ff4444";
     } else {
-      const t = 1 - (i / snake.length) * 0.55;
-      ctx.fillStyle = `rgba(0,${Math.floor(210*t)},${Math.floor(80*t)},1)`;
+      ctx.shadowBlur = 0;
+      const fade = 1 - (i / len) * 0.72;
+      const g = Math.floor(220 * fade);
+      const b = Math.floor(90 * fade);
+      ctx.fillStyle = `rgb(0,${g},${b})`;
     }
-    ctx.fillRect(s.x*CELL+1, s.y*CELL+1, CELL-2, CELL-2);
+
+    rr(px, py, sw, sw, brad);
+
+    // eyes on head
+    if (i === 0 && alive && CELL >= 10) {
+      ctx.shadowBlur = 0;
+      const hx = px + sw / 2;
+      const hy = py + sw / 2;
+      const eo = sw * 0.24;
+      const er = Math.max(1.5, sw * 0.11);
+      const ep = er * 0.45;
+
+      let ex1, ey1, ex2, ey2;
+      if      (dir.x ===  1) { ex1=hx+eo*0.6; ey1=hy-eo; ex2=hx+eo*0.6; ey2=hy+eo; }
+      else if (dir.x === -1) { ex1=hx-eo*0.6; ey1=hy-eo; ex2=hx-eo*0.6; ey2=hy+eo; }
+      else if (dir.y === -1) { ex1=hx-eo; ey1=hy-eo*0.6; ex2=hx+eo; ey2=hy-eo*0.6; }
+      else                   { ex1=hx-eo; ey1=hy+eo*0.6; ex2=hx+eo; ey2=hy+eo*0.6; }
+
+      ctx.fillStyle = "#e8ffe8";
+      ctx.beginPath(); ctx.arc(ex1, ey1, er, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex2, ey2, er, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = "#0a1a0a";
+      ctx.beginPath(); ctx.arc(ex1, ey1, ep, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex2, ey2, ep, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.shadowBlur = 0;
+}
+
+function drawFrame() { drawFrameInterp(1); }
+
+// ── Game loop ─────────────────────────────────────────────────────────────────
+
+function gameLoop(ts) {
+  if (!alive) return;
+  rafId = requestAnimationFrame(gameLoop);
+  const elapsed = ts - lastTickTime;
+  if (elapsed >= TICK_MS) {
+    lastTickTime = ts - (elapsed % TICK_MS);
+    step();
+  } else {
+    drawFrameInterp(elapsed / TICK_MS);
   }
 }
 
+// ── Game logic ────────────────────────────────────────────────────────────────
+
 function step() {
+  prevSnake = snake.map(s => ({ ...s }));
   dir = nextDir;
   const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
   if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS ||
       snake.some(s => s.x === head.x && s.y === head.y)) {
     alive = false;
-    clearInterval(loop);
+    cancelAnimationFrame(rafId);
     tg?.HapticFeedback?.notificationOccurred("error");
     const nb = Math.max(best, score);
     if (nb > best) { best = nb; localStorage.setItem("snake_best", best); }
     document.getElementById("best").textContent = best;
-    drawFrame();
+    submitScore(score);
+    drawFrameInterp(1);
     showGameOver();
     return;
   }
@@ -198,25 +388,29 @@ function step() {
     score++;
     document.getElementById("score").textContent = score;
     food = spawnFood();
+    prevSnake.unshift(prevSnake[0] || head);
     tg?.HapticFeedback?.impactOccurred("light");
   } else {
     snake.pop();
   }
-  drawFrame();
+  drawFrameInterp(1);
 }
 
 function startGame() {
   document.getElementById("overlay").style.display = "none";
-  clearInterval(loop);
-  snake   = [{ x: 10, y: 10 }];
-  food    = spawnFood();
-  dir     = { x: 1, y: 0 };
-  nextDir = { x: 1, y: 0 };
-  score   = 0;
-  alive   = true;
+  showTab("game");
+  cancelAnimationFrame(rafId);
+  snake     = [{ x: 10, y: 10 }];
+  prevSnake = [{ x: 10, y: 10 }];
+  food      = spawnFood();
+  dir       = { x: 1, y: 0 };
+  nextDir   = { x: 1, y: 0 };
+  score     = 0;
+  alive     = true;
+  lastTickTime = 0;
   document.getElementById("score").textContent = 0;
-  drawFrame();
-  loop = setInterval(step, 150);
+  drawFrameInterp(1);
+  rafId = requestAnimationFrame(gameLoop);
 }
 
 function showGameOver() {
@@ -226,18 +420,15 @@ function showGameOver() {
     <div class="sub">Счёт: ${score}</div>
     ${score > 0 && score >= best ? '<div class="rec">🎉 Новый рекорд!</div>' : ''}
     <button onclick="startGame()">ЕЩЁ РАЗ</button>
+    <button style="background:#111;color:#0f0;border:2px solid #0f0;margin-top:2px"
+      onclick="showTab('lb');document.getElementById('overlay').style.display='none'">
+      🏅 Посмотреть топ
+    </button>
   `;
   ov.style.display = "flex";
-  async function submitScore(score) {
-  const initData = window.Telegram?.WebApp?.initData;
-  if (!initData) return;
-  await fetch("https://f141608d-1c6f-48a7-b475-76bfe617af45-00-bg39mkj1p2mv.sisko.replit.dev/api/score", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ init_data: initData, score: score }),
-  });
 }
-}
+
+// ── Controls ──────────────────────────────────────────────────────────────────
 
 function setDir(dx, dy) {
   if (!alive) return;
