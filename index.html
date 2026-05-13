@@ -139,14 +139,12 @@ best = Number(localStorage.getItem("snake_best") || 0);
 document.getElementById("best").textContent = best;
 
 function showTab(tab) {
-  const tabs = document.querySelectorAll("#tabs button");
   const gp = document.getElementById("game-panel");
   gp.style.display = tab === "game" ? "flex" : "none";
   gp.style.flexDirection = "column";
   gp.style.alignItems = "center";
   document.getElementById("lb-panel").style.display = tab === "lb" ? "flex" : "none";
-  tabs[0].classList.toggle("active", tab === "game");
-  tabs[1].classList.toggle("active", tab === "lb");
+  document.querySelectorAll("#tabs button").forEach((b,i) => b.classList.toggle("active", i === (tab==="game"?0:1)));
   if (tab === "lb") loadLeaderboard();
 }
 
@@ -221,9 +219,7 @@ function drawGrid() {
 }
 
 function rr(x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
-  ctx.fill();
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill();
 }
 
 function drawFrameInterp(t) {
@@ -231,20 +227,18 @@ function drawFrameInterp(t) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   drawGrid();
 
+  // еда
   const fc = { x: food.x * CELL + CELL/2, y: food.y * CELL + CELL/2 };
   const fr = CELL / 2 - 2;
-  ctx.shadowColor = "#ff2244";
-  ctx.shadowBlur  = 14;
-  ctx.fillStyle   = "#ff3355";
+  ctx.fillStyle = "#ff3355";
   ctx.beginPath(); ctx.arc(fc.x, fc.y, fr, 0, Math.PI*2); ctx.fill();
-  ctx.shadowBlur  = 0;
-  ctx.fillStyle   = "rgba(255,220,220,0.55)";
+  ctx.fillStyle = "rgba(255,220,220,0.6)";
   ctx.beginPath(); ctx.arc(fc.x - fr*0.28, fc.y - fr*0.32, fr*0.32, 0, Math.PI*2); ctx.fill();
 
-  const len  = snake.length;
-  const pad  = Math.max(1, CELL * 0.08);
+  // змейка
+  const len = snake.length;
+  const pad = Math.max(1, CELL * 0.08);
   const brad = Math.max(3, CELL * 0.28);
-  ctx.shadowBlur = 0;
 
   for (let i = len - 1; i >= 0; i--) {
     const curr = snake[i];
@@ -254,18 +248,15 @@ function drawFrameInterp(t) {
     const sw = CELL - pad * 2;
 
     if (i === 0) {
-      ctx.shadowColor = alive ? "#00ff88" : "#ff4444";
-      ctx.shadowBlur  = alive ? 12 : 10;
-      ctx.fillStyle   = alive ? "#00ff88" : "#ff4444";
+      ctx.fillStyle = alive ? "#00ff88" : "#ff4444";
     } else {
-      ctx.shadowBlur = 0;
       const fade = 1 - (i / len) * 0.72;
       ctx.fillStyle = `rgb(0,${Math.floor(220*fade)},${Math.floor(90*fade)})`;
     }
     rr(px, py, sw, sw, brad);
 
+    // глаза
     if (i === 0 && alive && CELL >= 10) {
-      ctx.shadowBlur = 0;
       const hx = px + sw/2, hy = py + sw/2;
       const eo = sw * 0.24, er = Math.max(1.5, sw * 0.11), ep = er * 0.45;
       let ex1, ey1, ex2, ey2;
@@ -281,7 +272,6 @@ function drawFrameInterp(t) {
       ctx.beginPath(); ctx.arc(ex2, ey2, ep, 0, Math.PI*2); ctx.fill();
     }
   }
-  ctx.shadowBlur = 0;
 }
 
 function drawFrame() { drawFrameInterp(1); }
@@ -293,6 +283,7 @@ function gameLoop(ts) {
   if (elapsed >= TICK_MS) {
     lastTickTime = ts - (elapsed % TICK_MS);
     step();
+    drawFrameInterp((elapsed % TICK_MS) / TICK_MS); // рисуем сразу после шага
   } else {
     drawFrameInterp(elapsed / TICK_MS);
   }
@@ -374,23 +365,25 @@ document.querySelectorAll("#dpad button").forEach(btn => {
 });
 
 document.addEventListener("keydown", e => {
-  const map = {
-    ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0],
-    w:[0,-1], s:[0,1], a:[-1,0], d:[1,0],
-  };
+  const map = { ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0], w:[0,-1], s:[0,1], a:[-1,0], d:[1,0] };
   if (map[e.key]) { e.preventDefault(); setDir(...map[e.key]); }
 });
 
-canvas.addEventListener("touchstart", e => {
+// Свайпы по всему экрану (кроме кнопок)
+document.addEventListener("touchstart", e => {
+  if (e.target.closest("#dpad")) return;
   touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 }, { passive: true });
 
-canvas.addEventListener("touchend", e => {
+document.addEventListener("touchend", e => {
   if (!touchStart) return;
+  if (e.target.closest("#dpad")) return;
   const dx = e.changedTouches[0].clientX - touchStart.x;
   const dy = e.changedTouches[0].clientY - touchStart.y;
-  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+  touchStart = null;
+  if (Math.abs(dx) < 15 && Math.abs(dy) < 15) return;
   Math.abs(dx) > Math.abs(dy) ? setDir(dx > 0 ? 1 : -1, 0) : setDir(0, dy > 0 ? 1 : -1);
+  tg?.HapticFeedback?.selectionChanged();
 }, { passive: true });
 
 drawFrame();
