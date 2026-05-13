@@ -3,57 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Snake Pro Max</title>
+  <title>Snake Pro</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #000; color: #0f0; font-family: 'Courier New', monospace;
+      background: #000; color: #0f0; font-family: sans-serif;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100dvh; overflow: hidden; touch-action: none; -webkit-user-select: none;
+      height: 100vh; height: 100dvh; overflow: hidden; touch-action: none;
     }
-
-    /* Интерфейс */
     #top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 400px; padding: 10px; }
-    #tabs { display: flex; flex: 1; background: #111; border-radius: 10px; padding: 3px; margin-right: 10px; }
+    #tabs { display: flex; flex: 1; background: #111; border-radius: 10px; padding: 3px; }
     #tabs button {
       flex: 1; padding: 8px; background: transparent; border: none; color: #555;
-      font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 8px;
+      font-size: 12px; font-weight: bold; border-radius: 8px;
     }
-    #tabs button.active { background: var(--clr, #0f0); color: #000; }
+    #tabs button.active { background: #0f4; color: #000; }
     
-    .theme-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; margin-left: 8px; }
-    .theme-dot.active { border-color: #fff; transform: scale(1.1); }
+    #scoreboard { display: flex; justify-content: space-between; width: 100%; max-width: 400px; margin-bottom: 10px; padding: 0 15px; }
+    canvas { display: block; border: 2px solid #0f4; background: #050505; border-radius: 8px; }
 
-    #scoreboard { display: flex; justify-content: space-between; width: 100%; max-width: 400px; margin-bottom: 10px; font-size: 15px; padding: 0 15px; }
-    #scoreboard b { color: #fff; }
-
-    canvas { display: block; border: 3px solid var(--clr, #0f0); border-radius: 12px; background: #050505; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-
-    /* Кнопки */
-    #dpad { display: grid; grid-template-areas: ". up ." "left . right" ". down ."; gap: 12px; margin-top: 20px; }
+    #dpad { display: grid; grid-template-areas: ". up ." "left . right" ". down ."; gap: 10px; margin-top: 20px; }
     #dpad button {
-      width: 70px; height: 70px; background: #0d1a0d; border: 2px solid var(--clr, #0f4); color: #fff;
-      font-size: 26px; border-radius: 20px; transition: 0.1s;
+      width: 65px; height: 65px; background: #111; border: 1px solid #333; color: #fff;
+      font-size: 24px; border-radius: 15px;
     }
-    #dpad button:active { background: var(--clr, #0f0); color: #000; transform: scale(0.9); }
+    #dpad button:active { background: #0f4; color: #000; }
 
-    /* Оверлей */
     #overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.92);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
     }
-    .play-btn { margin-top: 25px; padding: 18px 60px; background: var(--clr,#0f0); color: #000; border: none; font-size: 20px; font-weight: bold; border-radius: 15px; cursor: pointer; }
+    .play-btn { padding: 15px 50px; background: #0f4; color: #000; border: none; font-size: 20px; font-weight: bold; border-radius: 12px; }
     
-    /* Скины */
-    .skin-row { display: flex; gap: 15px; margin: 15px 0; }
-    .skin-btn { width: 40px; height: 40px; border-radius: 10px; border: 2px solid #444; cursor: pointer; }
-    .skin-btn.active { border-color: #fff; transform: scale(1.2); }
-
-    /* Таблица */
-    #lb-panel { display: none; width: 100%; max-width: 350px; padding: 20px; }
-    .lb-row { display: flex; justify-content: space-between; padding: 12px; background: #111; margin-bottom: 6px; border-radius: 8px; border-left: 4px solid var(--clr); }
-    .lb-me { border: 1px solid #ff0; background: #1a1a00; }
+    #lb-panel { display: none; width: 100%; max-width: 350px; padding: 20px; overflow-y: auto; }
+    .lb-row { display: flex; justify-content: space-between; padding: 10px; background: #111; margin-bottom: 5px; border-radius: 6px; }
   </style>
 </head>
 <body>
@@ -63,83 +47,71 @@
     <button id="tab-game" class="active" onclick="showTab('game')">ИГРА</button>
     <button id="tab-lb" onclick="showTab('lb')">ТОП</button>
   </div>
-  <div style="display: flex;">
-    <div class="theme-dot active" data-theme="matrix" style="background:#0c4" onclick="setTheme('matrix')"></div>
-    <div class="theme-dot" data-theme="neon" style="background:#c0f" onclick="setTheme('neon')"></div>
-  </div>
 </div>
 
 <div id="game-panel" style="display:flex; flex-direction:column; align-items:center;">
   <div id="scoreboard">
-    <div>СЧЁТ: <b id="score">0</b></div>
-    <div>РЕКОРД: <b id="best">0</b></div>
+    <div>СЧЁТ: <span id="score">0</span></div>
+    <div>РЕКОРД: <span id="best">0</span></div>
   </div>
   <canvas id="game"></canvas>
   <div id="dpad">
-    <button style="grid-area:up" data-d="up">▲</button>
-    <button style="grid-area:left" data-d="left">◀</button>
-    <button style="grid-area:right" data-d="right">▶</button>
-    <button style="grid-area:down" data-d="down">▼</button>
+    <button style="grid-area:up" onpointerdown="handleInput(0,-1)">▲</button>
+    <button style="grid-area:left" onpointerdown="handleInput(-1,0)">◀</button>
+    <button style="grid-area:right" onpointerdown="handleInput(1,0)">▶</button>
+    <button style="grid-area:down" onpointerdown="handleInput(0,1)">▼</button>
   </div>
 </div>
 
 <div id="lb-panel"></div>
 
 <div id="overlay">
-  <h1 style="font-size:45px; color:var(--clr); letter-spacing:5px;">SNAKE</h1>
-  <p id="final-score" style="color:#fff; margin-top:10px; font-size:18px; display:none;"></p>
-  
-  <div class="skin-row">
-    <div class="skin-btn active" style="background:#0f4" data-skin="green" onclick="setSkin('green')"></div>
-    <div class="skin-btn" style="background:#f44" data-skin="red" onclick="setSkin('red')"></div>
-    <div class="skin-btn" style="background:#4af" data-skin="blue" onclick="setSkin('blue')"></div>
-  </div>
-
+  <h1 style="margin-bottom:20px; font-size:40px;">SNAKE</h1>
   <button class="play-btn" onclick="startGame()">ИГРАТЬ</button>
 </div>
 
 <script>
 const tg = window.Telegram?.WebApp;
 if (tg) {
-    tg.ready(); tg.expand();
-    tg.enableClosingConfirmation();
-    if (tg.isVerticalSwipesEnabled) tg.disableVerticalSwipes();
+  tg.ready();
+  tg.expand();
+  if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
 }
 
 const API_URL = "https://f141608d-1c6f-48a7-b475-76bfe617af45-00-bg39mkj1p2mv.sisko.replit.dev/api";
-const THEMES = {
-  matrix: { bg:'#050805', clr:'#0f4', food:'#f35' },
-  neon:   { bg:'#080010', clr:'#d0f', food:'#ff0' }
-};
-
-let curTheme = 'matrix', curSkin = 'green', score = 0, best = localStorage.getItem('snake_best') || 0;
-let alive = false, canvas = document.getElementById("game"), ctx = canvas.getContext("2d");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 const COLS = 20;
-let CELL, snake = [], prevSnake = [], food = {x:5,y:5}, dir = {x:1,y:0}, nextDir = {x:1,y:0};
-let lastTick = 0, tickMs = 140;
 
-function setTheme(n) {
-  curTheme = n;
-  document.documentElement.style.setProperty('--clr', THEMES[n].clr);
-  document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === n));
-  if(!alive) render(1);
-}
-
-function setSkin(s) {
-  curSkin = s;
-  document.querySelectorAll('.skin-btn').forEach(b => b.classList.toggle('active', b.dataset.skin === s));
-}
+let CELL, score = 0, alive = false;
+let snake = [], prevSnake = [], food = {x:5, y:5};
+let dir = {x:1, y:0}, nextDir = {x:1, y:0};
+let lastTick = 0, tickMs = 150;
+let best = localStorage.getItem('snake_best') || 0;
 
 function resize() {
-  const size = Math.min(window.innerWidth - 30, window.innerHeight - 400, 400);
+  const size = Math.min(window.innerWidth - 40, window.innerHeight - 350, 400);
   CELL = Math.floor(size / COLS);
   canvas.width = canvas.height = CELL * COLS;
 }
 
+function spawnFood() {
+  food = { x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*COLS) };
+  if(snake.some(s => s.x === food.x && s.y === food.y)) spawnFood();
+}
+
+function handleInput(x, y) {
+  if (x !== -dir.x || y !== -dir.y) nextDir = {x, y};
+  if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+}
+
 function startGame() {
   document.getElementById('overlay').style.display = 'none';
-  alive = true; score = 0; dir = {x:1,y:0}; nextDir = {x:1,y:0};
-  snake = [{x:10,y:10}, {x:9,y:10}, {x:8,y:10}];
+  alive = true;
+  score = 0;
+  dir = {x:1, y:0};
+  nextDir = {x:1, y:0};
+  snake = [{x:10, y:10}, {x:9, y:10}, {x:8, y:10}];
   prevSnake = JSON.parse(JSON.stringify(snake));
   spawnFood();
   document.getElementById('score').textContent = "0";
@@ -147,29 +119,20 @@ function startGame() {
   requestAnimationFrame(gameLoop);
 }
 
-function spawnFood() {
-  food = { x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*COLS) };
-  if(snake.some(s=>s.x===food.x && s.y===food.y)) spawnFood();
-}
-
-function handleInput(x, y) {
-  if (x !== -dir.x || y !== -dir.y) nextDir = {x, y};
-  tg?.HapticFeedback?.selectionChanged();
-}
-
 function gameLoop(t) {
   if (!alive) return;
   requestAnimationFrame(gameLoop);
 
   const delta = t - lastTick;
-  const progress = Math.min(delta / tickMs, 1);
+  let progress = delta / tickMs;
 
   if (delta >= tickMs) {
     prevSnake = JSON.parse(JSON.stringify(snake));
     dir = nextDir;
     const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
-    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= COLS || snake.some(s=>s.x===head.x && s.y===head.y)) {
+    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= COLS || snake.some(s => s.x === head.x && s.y === head.y)) {
+      alive = false;
       return endGame();
     }
 
@@ -177,91 +140,62 @@ function gameLoop(t) {
     if (head.x === food.x && head.y === food.y) {
       score++;
       document.getElementById('score').textContent = score;
-      tg?.HapticFeedback?.impactOccurred('light');
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
       spawnFood();
-    } else { snake.pop(); }
+    } else {
+      snake.pop();
+    }
     lastTick = t;
+    progress = 0;
   }
   render(progress);
 }
 
 function render(t) {
-  const theme = THEMES[curTheme];
-  ctx.fillStyle = theme.bg;
+  ctx.fillStyle = "#050505";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Сетка
-  ctx.strokeStyle = "rgba(255,255,255,0.03)";
-  for(let i=0; i<=COLS; i++) {
-    ctx.beginPath(); ctx.moveTo(i*CELL, 0); ctx.lineTo(i*CELL, canvas.height); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, i*CELL); ctx.lineTo(canvas.width, i*CELL); ctx.stroke();
-  }
-
   // Еда
-  const fX = food.x * CELL + CELL/2;
-  const fY = food.y * CELL + CELL/2;
-  ctx.fillStyle = theme.food;
-  ctx.beginPath();
-  ctx.arc(fX, fY, (CELL/2.2) + Math.sin(Date.now()/100)*1, 0, Math.PI*2);
-  ctx.fill();
+  ctx.fillStyle = "#f35";
+  ctx.fillRect(food.x * CELL + 2, food.y * CELL + 2, CELL - 4, CELL - 4);
 
-  // Змейка
-  const skinColors = { green: theme.clr, red: '#f44', blue: '#4af' };
-  const baseColor = skinColors[curSkin];
-
+  // Змейка с интерполяцией
   snake.forEach((p, i) => {
     const prev = prevSnake[i] || p;
     const drawX = (prev.x + (p.x - prev.x) * t) * CELL;
     const drawY = (prev.y + (p.y - prev.y) * t) * CELL;
 
-    ctx.fillStyle = i === 0 ? baseColor : baseColor + "AA";
-    ctx.beginPath();
-    ctx.roundRect(drawX + 1, drawY + 1, CELL - 2, CELL - 2, CELL/4);
-    ctx.fill();
+    ctx.fillStyle = i === 0 ? "#0f4" : "#0a4";
+    ctx.fillRect(drawX + 1, drawY + 1, CELL - 2, CELL - 2);
   });
 }
 
 function endGame() {
-  alive = false;
   if (score > best) {
     best = score;
     localStorage.setItem('snake_best', best);
     document.getElementById('best').textContent = best;
   }
-  document.getElementById('final-score').textContent = `СЧЁТ: ${score}`;
-  document.getElementById('final-score').style.display = 'block';
   document.getElementById('overlay').style.display = 'flex';
-  tg?.HapticFeedback?.notificationOccurred('error');
+  if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
   
   fetch(`${API_URL}/score`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ init_data: tg?.initData, score: score })
-  }).catch(()=>{});
+  }).catch(() => {});
 }
 
-// Управление кнопками
-document.querySelectorAll('#dpad button').forEach(btn => {
-  btn.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    const d = btn.dataset.d;
-    if(d === 'up') handleInput(0,-1);
-    if(d === 'down') handleInput(0,1);
-    if(d === 'left') handleInput(-1,0);
-    if(d === 'right') handleInput(1,0);
-  });
-});
-
-// Тач-свайпы
-let touchS = null;
-document.addEventListener('touchstart', e => { touchS = {x: e.touches[0].clientX, y: e.touches[0].clientY}; }, {passive: false});
+// Управление свайпами
+let ts = null;
+document.addEventListener('touchstart', e => { ts = {x:e.touches[0].clientX, y:e.touches[0].clientY}; }, {passive: false});
 document.addEventListener('touchmove', e => {
-  if (!touchS) return;
-  const dx = e.touches[0].clientX - touchS.x, dy = e.touches[0].clientY - touchS.y;
-  if (Math.abs(dx) > 25 || Math.abs(dy) > 25) {
+  if (!ts) return;
+  const dx = e.touches[0].clientX - ts.x, dy = e.touches[0].clientY - ts.y;
+  if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
     if (Math.abs(dx) > Math.abs(dy)) handleInput(dx > 0 ? 1 : -1, 0);
     else handleInput(0, dy > 0 ? 1 : -1);
-    touchS = null;
+    ts = null;
   }
   e.preventDefault();
 }, {passive: false});
@@ -269,30 +203,27 @@ document.addEventListener('touchmove', e => {
 function showTab(tab) {
   document.getElementById('game-panel').style.display = tab === 'game' ? 'flex' : 'none';
   document.getElementById('lb-panel').style.display = tab === 'lb' ? 'flex' : 'none';
-  document.getElementById('tab-game').classList.toggle('active', tab === 'game');
-  document.getElementById('tab-lb').classList.toggle('active', tab === 'lb');
-  if(tab === 'lb') loadLeaderboard();
+  document.getElementById('tab-game').className = tab === 'game' ? 'active' : '';
+  document.getElementById('tab-lb').className = tab === 'lb' ? 'active' : '';
+  if (tab === 'lb') loadLeaderboard();
 }
 
 async function loadLeaderboard() {
   const lb = document.getElementById('lb-panel');
-  lb.innerHTML = '<h2 style="text-align:center; color:#555;">Загрузка...</h2>';
+  lb.innerHTML = '<p>Загрузка...</p>';
   try {
     const res = await fetch(`${API_URL}/leaderboard`);
     const data = await res.json();
-    lb.innerHTML = '<h2 style="text-align:center; margin-bottom:15px; color:var(--clr)">ТОП ИГРОКОВ</h2>';
-    const myId = tg?.initDataUnsafe?.user?.id;
+    lb.innerHTML = '<h2 style="margin-bottom:10px">ТОП</h2>';
     data.forEach(r => {
-      const isMe = myId && String(r.user_id) === String(myId);
-      lb.innerHTML += `<div class="lb-row ${isMe?'lb-me':''}"><span>${r.rank}. ${r.name}</span><b>${r.score}</b></div>`;
+      lb.innerHTML += `<div class="lb-row"><span>${r.rank}. ${r.name}</span><b>${r.score}</b></div>`;
     });
-  } catch(e) { lb.innerHTML = '<p style="text-align:center">Ошибка загрузки</p>'; }
+  } catch(e) { lb.innerHTML = 'Ошибка'; }
 }
 
 resize();
-window.addEventListener('resize', resize);
-setTheme('matrix');
 document.getElementById('best').textContent = best;
+window.addEventListener('resize', resize);
 </script>
 </body>
 </html>
