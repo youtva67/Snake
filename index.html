@@ -19,88 +19,135 @@
       overflow: hidden;
       user-select: none;
     }
-    #tabs { display: flex; gap: 0; margin-bottom: 10px; }
+    #top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 380px;
+      padding: 0 4px;
+      margin-bottom: 6px;
+      gap: 6px;
+    }
+    #tabs { display: flex; gap: 0; flex: 1; }
     #tabs button {
-      flex: 1; padding: 6px 20px;
-      background: #111; border: 2px solid #0f0; color: #0f0;
-      font-family: inherit; font-size: 13px; letter-spacing: 1px;
+      flex: 1; padding: 6px 10px;
+      background: #111; border: 2px solid var(--clr, #0f0); color: var(--clr, #0f0);
+      font-family: inherit; font-size: 12px; letter-spacing: 1px;
       cursor: pointer; transition: background 0.1s;
     }
     #tabs button:first-child { border-radius: 6px 0 0 6px; border-right: none; }
     #tabs button:last-child  { border-radius: 0 6px 6px 0; }
-    #tabs button.active { background: #0f0; color: #000; font-weight: bold; }
+    #tabs button.active { background: var(--clr, #0f0); color: #000; font-weight: bold; }
+    #theme-picker { display: flex; gap: 5px; }
+    .theme-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid transparent; cursor: pointer; transition: transform 0.1s;
+    }
+    .theme-dot.active { border-color: #fff; transform: scale(1.2); }
+    .theme-dot[data-theme="matrix"] { background: #00cc44; }
+    .theme-dot[data-theme="neon"]   { background: #cc00ff; }
+    .theme-dot[data-theme="arctic"] { background: #44aaff; }
     #scoreboard {
-      display: flex; gap: 32px; margin-bottom: 10px;
-      font-size: 13px; letter-spacing: 2px;
+      display: flex; gap: 20px; margin-bottom: 8px;
+      font-size: 12px; letter-spacing: 2px;
     }
-    #scoreboard span { color: #fff; font-size: 16px; font-weight: bold; }
-    canvas {
-      background: #111; border: 2px solid #0f0;
-      display: block; touch-action: none;
-    }
+    #scoreboard span { color: #fff; font-size: 15px; font-weight: bold; }
+    #timer-display { color: #ff0; font-size: 14px; letter-spacing: 1px; min-width: 60px; text-align: center; }
+    canvas { display: block; touch-action: none; border: 2px solid var(--clr, #0f0); }
     #dpad {
       display: grid;
       grid-template-areas: ". up ." "left . right" ". down .";
-      gap: 8px; margin-top: 14px;
+      gap: 8px; margin-top: 12px;
     }
     #dpad button {
-      width: 68px; height: 68px;
-      background: #0d1f0d; border: 2px solid #00cc44; color: #00ff66;
-      font-size: 26px; cursor: pointer; border-radius: 14px;
+      width: 64px; height: 64px;
+      background: #0d1f0d; border: 2px solid var(--clr, #00cc44); color: var(--clr, #00ff66);
+      font-size: 24px; cursor: pointer; border-radius: 14px;
       -webkit-tap-highlight-color: transparent;
-      box-shadow: 0 0 8px rgba(0,255,80,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
-      transition: background 0.08s, box-shadow 0.08s;
+      transition: background 0.08s;
     }
-    #dpad button:active { background: #00cc44; color: #000; box-shadow: 0 0 18px rgba(0,255,80,0.55); }
+    #dpad button:active { background: var(--clr, #00cc44); color: #000; }
     #dpad button[data-d="up"]    { grid-area: up; }
     #dpad button[data-d="left"]  { grid-area: left; }
     #dpad button[data-d="right"] { grid-area: right; }
     #dpad button[data-d="down"]  { grid-area: down; }
     #overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.88);
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 12px;
+      align-items: center; justify-content: center; gap: 10px;
+      z-index: 10;
     }
-    #overlay h1 { font-size: 34px; color: #0f0; letter-spacing: 4px; }
-    #overlay .sub { font-size: 18px; color: #fff; }
-    #overlay .rec { font-size: 14px; color: #ff0; }
-    #overlay button {
-      margin-top: 6px; padding: 12px 36px;
-      background: #0f0; color: #000; border: none;
-      font-size: 17px; font-family: inherit; font-weight: bold;
-      letter-spacing: 2px; cursor: pointer; border-radius: 6px;
+    #overlay h1 { font-size: 30px; color: var(--clr,#0f0); letter-spacing: 4px; }
+    #overlay .sub { font-size: 17px; color: #fff; }
+    #overlay .rec { font-size: 13px; color: #ff0; }
+    .skin-row { display: flex; gap: 10px; margin: 4px 0; }
+    .skin-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 2px solid #444; cursor: pointer; transition: transform 0.1s;
     }
-    #overlay button:active { opacity: 0.8; }
+    .skin-btn.active { border-color: #fff; transform: scale(1.15); }
+    .skin-btn[data-skin="green"] { background: linear-gradient(135deg,#00ff88,#006633); }
+    .skin-btn[data-skin="fire"]  { background: linear-gradient(135deg,#ffaa00,#ff2200); }
+    .skin-btn[data-skin="ice"]   { background: linear-gradient(135deg,#00eeff,#0033cc); }
+    .challenge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 260px; }
+    .chal-btn {
+      padding: 9px 6px; background: #111; border: 2px solid #333;
+      color: #aaa; font-family: inherit; font-size: 11px; letter-spacing: 1px;
+      cursor: pointer; border-radius: 8px; transition: all 0.1s; text-align: center;
+    }
+    .chal-btn .chal-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+    .chal-btn.active { border-color: var(--clr,#0f0); color: var(--clr,#0f0); background: #0a1a0a; }
+    .play-btn {
+      margin-top: 4px; padding: 12px 40px;
+      background: var(--clr,#0f0); color: #000; border: none;
+      font-size: 16px; font-family: inherit; font-weight: bold;
+      letter-spacing: 2px; cursor: pointer; border-radius: 8px;
+    }
+    .play-btn:active { opacity: 0.8; }
+    .ghost-btn {
+      background: #111; color: var(--clr,#0f0);
+      border: 2px solid var(--clr,#0f0); margin-top: 2px;
+      padding: 9px 20px; font-size: 13px; font-family: inherit;
+      cursor: pointer; border-radius: 8px; letter-spacing: 1px;
+    }
     #lb-panel {
       display: none; flex-direction: column; align-items: center;
-      width: 100%; max-width: 340px; gap: 6px;
+      width: 100%; max-width: 340px; gap: 5px;
     }
-    #lb-panel h2 { font-size: 18px; letter-spacing: 3px; margin-bottom: 4px; }
+    #lb-panel h2 { font-size: 17px; letter-spacing: 3px; margin-bottom: 4px; color: var(--clr,#0f0); }
     .lb-row {
       width: 100%; display: flex; justify-content: space-between;
-      padding: 7px 14px; background: #111; border: 1px solid #0f0;
-      border-radius: 4px; font-size: 14px;
+      padding: 7px 14px; background: #111; border: 1px solid var(--clr,#0f0);
+      border-radius: 4px; font-size: 13px;
     }
     .lb-row .lb-rank { color: #ff0; width: 28px; }
     .lb-row .lb-name { flex: 1; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .lb-row .lb-score { color: #0f0; font-weight: bold; }
+    .lb-row .lb-score { color: var(--clr,#0f0); font-weight: bold; }
     .lb-row.lb-me { border-color: #ff0; background: #1a1a00; }
-    #lb-empty { color: #555; font-size: 14px; margin-top: 20px; }
-    #lb-loading { color: #555; font-size: 14px; }
+    #lb-empty, #lb-loading { color: #555; font-size: 13px; margin-top: 16px; }
   </style>
 </head>
 <body>
 
-<div id="tabs">
-  <button class="active" onclick="showTab('game')">🎮 ИГРА</button>
-  <button onclick="showTab('lb')">🏅 ТОП</button>
+<div id="top-bar">
+  <div id="tabs">
+    <button class="active" onclick="showTab('game')">🎮 ИГРА</button>
+    <button onclick="showTab('lb')">🏅 ТОП</button>
+  </div>
+  <div id="theme-picker">
+    <div class="theme-dot active" data-theme="matrix" onclick="setTheme('matrix')"></div>
+    <div class="theme-dot" data-theme="neon"   onclick="setTheme('neon')"></div>
+    <div class="theme-dot" data-theme="arctic" onclick="setTheme('arctic')"></div>
+  </div>
 </div>
 
-<div id="game-panel">
+<div id="game-panel" style="display:flex;flex-direction:column;align-items:center">
   <div id="scoreboard">
     СЧЁТ:&nbsp;<span id="score">0</span>
-    &nbsp;&nbsp;
+    &nbsp;
     РЕКОРД:&nbsp;<span id="best">0</span>
+    <span id="timer-display" style="display:none"></span>
   </div>
   <canvas id="game"></canvas>
   <div id="dpad">
@@ -118,7 +165,28 @@
 
 <div id="overlay">
   <h1>🐍 SNAKE</h1>
-  <button onclick="startGame()">ИГРАТЬ</button>
+  <div style="color:#888;font-size:11px;letter-spacing:2px">СКИН ЗМЕЙКИ</div>
+  <div class="skin-row">
+    <div class="skin-btn active" data-skin="green" onclick="setSkin('green')"></div>
+    <div class="skin-btn"       data-skin="fire"  onclick="setSkin('fire')"></div>
+    <div class="skin-btn"       data-skin="ice"   onclick="setSkin('ice')"></div>
+  </div>
+  <div style="color:#888;font-size:11px;letter-spacing:2px;margin-top:6px">РЕЖИМ</div>
+  <div class="challenge-grid">
+    <button class="chal-btn active" data-chal="classic" onclick="setChallenge('classic')">
+      <span class="chal-icon">🐍</span>КЛАССИКА
+    </button>
+    <button class="chal-btn" data-chal="sprint" onclick="setChallenge('sprint')">
+      <span class="chal-icon">⚡</span>СПРИНТ
+    </button>
+    <button class="chal-btn" data-chal="wrap" onclick="setChallenge('wrap')">
+      <span class="chal-icon">🌀</span>БЕЗ СТЕН
+    </button>
+    <button class="chal-btn" data-chal="blitz" onclick="setChallenge('blitz')">
+      <span class="chal-icon">⏱</span>БЛИЦ 60с
+    </button>
+  </div>
+  <button class="play-btn" onclick="startGame()">ИГРАТЬ</button>
 </div>
 
 <script>
@@ -127,16 +195,69 @@ if (tg) { tg.ready(); tg.expand(); }
 
 const API = "https://f141608d-1c6f-48a7-b475-76bfe617af45-00-bg39mkj1p2mv.sisko.replit.dev/api";
 
+const THEMES = {
+  matrix: { bg:'#0a0f0a', gridColor:'rgba(0,255,0,0.06)',   clr:'#00ff44', foodColor:'#ff3355', foodShine:'rgba(255,200,200,0.6)' },
+  neon:   { bg:'#08000f', gridColor:'rgba(200,0,255,0.07)', clr:'#dd00ff', foodColor:'#ff6600', foodShine:'rgba(255,220,160,0.6)' },
+  arctic: { bg:'#020810', gridColor:'rgba(80,160,255,0.08)',clr:'#44bbff', foodColor:'#ff3388', foodShine:'rgba(255,200,230,0.6)' },
+};
+
+const SKINS = {
+  green: { head:'#00ff88', body: f=>`rgb(0,${Math.floor(220*f)},${Math.floor(90*f)})`,   dead:'#ff4444' },
+  fire:  { head:'#ffcc00', body: f=>`rgb(${Math.floor(255*f)},${Math.floor(90*f)},0)`,   dead:'#4488ff' },
+  ice:   { head:'#00eeff', body: f=>`rgb(${Math.floor(30*f)},${Math.floor(160*f)},${Math.floor(255*f)})`, dead:'#ff4444' },
+};
+
+const CHALLENGES = {
+  classic: { tickMs:190, wrap:false, timeLimit:0 },
+  sprint:  { tickMs:100, wrap:false, timeLimit:0 },
+  wrap:    { tickMs:190, wrap:true,  timeLimit:0 },
+  blitz:   { tickMs:140, wrap:false, timeLimit:60 },
+};
+
+let curTheme     = localStorage.getItem('snake_theme')     || 'matrix';
+let curSkin      = localStorage.getItem('snake_skin')      || 'green';
+let curChallenge = localStorage.getItem('snake_challenge') || 'classic';
+
 const canvas = document.getElementById("game");
 const ctx    = canvas.getContext("2d");
 const COLS = 20, ROWS = 20;
 
-let CELL, rafId, score, best, snake, prevSnake, food, dir, nextDir, alive, touchStart;
+let CELL, TICK_MS;
+let rafId, timerInterval;
+let score, best, snake, prevSnake, food, dir, nextDir, alive, touchStart, timeLeft;
 let lastTickTime = 0;
-const TICK_MS = 190;
 
 best = Number(localStorage.getItem("snake_best") || 0);
 document.getElementById("best").textContent = best;
+
+function applyTheme(theme) {
+  document.documentElement.style.setProperty('--clr', THEMES[theme].clr);
+}
+
+function setTheme(name) {
+  curTheme = name;
+  localStorage.setItem('snake_theme', name);
+  applyTheme(name);
+  document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === name));
+  if (!alive) drawFrame();
+}
+
+function setSkin(name) {
+  curSkin = name;
+  localStorage.setItem('snake_skin', name);
+  document.querySelectorAll('.skin-btn').forEach(b => b.classList.toggle('active', b.dataset.skin === name));
+}
+
+function setChallenge(name) {
+  curChallenge = name;
+  localStorage.setItem('snake_challenge', name);
+  document.querySelectorAll('.chal-btn').forEach(b => b.classList.toggle('active', b.dataset.chal === name));
+}
+
+applyTheme(curTheme);
+document.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('active', d.dataset.theme === curTheme));
+document.querySelectorAll('.skin-btn').forEach(b => b.classList.toggle('active', b.dataset.skin === curSkin));
+document.querySelectorAll('.chal-btn').forEach(b => b.classList.toggle('active', b.dataset.chal === curChallenge));
 
 function showTab(tab) {
   const gp = document.getElementById("game-panel");
@@ -144,7 +265,7 @@ function showTab(tab) {
   gp.style.flexDirection = "column";
   gp.style.alignItems = "center";
   document.getElementById("lb-panel").style.display = tab === "lb" ? "flex" : "none";
-  document.querySelectorAll("#tabs button").forEach((b,i) => b.classList.toggle("active", i === (tab==="game"?0:1)));
+  document.querySelectorAll("#tabs button").forEach((b,i) => b.classList.toggle("active", i===(tab==="game"?0:1)));
   if (tab === "lb") loadLeaderboard();
 }
 
@@ -156,25 +277,16 @@ async function loadLeaderboard() {
     const rows = await res.json();
     const myId = tg?.initDataUnsafe?.user?.id;
     panel.innerHTML = "<h2>🏅 ТАБЛИЦА</h2>";
-    if (!rows.length) {
-      panel.innerHTML += "<div id='lb-empty'>Пока никто не играл. Будь первым!</div>";
-      return;
-    }
+    if (!rows.length) { panel.innerHTML += "<div id='lb-empty'>Пока никто не играл!</div>"; return; }
     const medals = ["🥇","🥈","🥉"];
     rows.forEach(r => {
       const isMe = myId && String(r.user_id) === String(myId);
       const div = document.createElement("div");
       div.className = "lb-row" + (isMe ? " lb-me" : "");
-      div.innerHTML = `
-        <span class="lb-rank">${medals[r.rank-1] || r.rank + "."}</span>
-        <span class="lb-name">${r.name}${isMe ? " ★" : ""}</span>
-        <span class="lb-score">${r.score}</span>
-      `;
+      div.innerHTML = `<span class="lb-rank">${medals[r.rank-1]||r.rank+"."}</span><span class="lb-name">${r.name}${isMe?" ★":""}</span><span class="lb-score">${r.score}</span>`;
       panel.appendChild(div);
     });
-  } catch {
-    panel.innerHTML += "<div id='lb-empty'>Не удалось загрузить</div>";
-  }
+  } catch { panel.innerHTML += "<div id='lb-empty'>Не удалось загрузить</div>"; }
 }
 
 async function submitScore(s) {
@@ -190,8 +302,8 @@ async function submitScore(s) {
 }
 
 function resize() {
-  const maxW = Math.min(window.innerWidth  - 16, 380);
-  const maxH = Math.min(window.innerHeight - 210, 380);
+  const maxW = Math.min(window.innerWidth - 16, 380);
+  const maxH = Math.min(window.innerHeight - 205, 380);
   CELL = Math.floor(Math.min(maxW, maxH) / COLS);
   canvas.width  = CELL * COLS;
   canvas.height = CELL * ROWS;
@@ -201,76 +313,85 @@ window.addEventListener("resize", () => { resize(); if (!alive) drawFrame(); });
 
 function spawnFood() {
   for (let i = 0; i < 400; i++) {
-    const f = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
-    if (!snake.some(s => s.x === f.x && s.y === f.y)) return f;
+    const f = { x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*ROWS) };
+    if (!snake.some(s => s.x===f.x && s.y===f.y)) return f;
   }
-  return { x: 0, y: 0 };
+  return { x:0, y:0 };
 }
 
 function drawGrid() {
-  ctx.strokeStyle = "rgba(0,255,0,0.06)";
+  ctx.strokeStyle = THEMES[curTheme].gridColor;
   ctx.lineWidth = 0.5;
-  for (let i = 0; i <= COLS; i++) {
-    ctx.beginPath(); ctx.moveTo(i*CELL, 0); ctx.lineTo(i*CELL, canvas.height); ctx.stroke();
-  }
-  for (let j = 0; j <= ROWS; j++) {
-    ctx.beginPath(); ctx.moveTo(0, j*CELL); ctx.lineTo(canvas.width, j*CELL); ctx.stroke();
-  }
+  for (let i=0;i<=COLS;i++) { ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,canvas.height); ctx.stroke(); }
+  for (let j=0;j<=ROWS;j++) { ctx.beginPath(); ctx.moveTo(0,j*CELL); ctx.lineTo(canvas.width,j*CELL); ctx.stroke(); }
 }
 
-function rr(x, y, w, h, r) {
-  ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill();
-}
+function rr(x,y,w,h,r) { ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
 
 function drawFrameInterp(t) {
-  ctx.fillStyle = "#0a0f0a";
+  const th   = THEMES[curTheme];
+  const skin = SKINS[curSkin];
+  const chal = CHALLENGES[curChallenge];
+
+  ctx.fillStyle = th.bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   drawGrid();
 
   // еда
-  const fc = { x: food.x * CELL + CELL/2, y: food.y * CELL + CELL/2 };
-  const fr = CELL / 2 - 2;
-  ctx.fillStyle = "#ff3355";
+  const fc = { x: food.x*CELL+CELL/2, y: food.y*CELL+CELL/2 };
+  const fr = CELL/2 - 2;
+  ctx.fillStyle = th.foodColor;
   ctx.beginPath(); ctx.arc(fc.x, fc.y, fr, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = "rgba(255,220,220,0.6)";
-  ctx.beginPath(); ctx.arc(fc.x - fr*0.28, fc.y - fr*0.32, fr*0.32, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = th.foodShine;
+  ctx.beginPath(); ctx.arc(fc.x-fr*0.28, fc.y-fr*0.32, fr*0.32, 0, Math.PI*2); ctx.fill();
 
   // змейка
   const len = snake.length;
-  const pad = Math.max(1, CELL * 0.08);
-  const brad = Math.max(3, CELL * 0.28);
+  const pad = Math.max(1, CELL*0.07);
+  const brad = Math.max(3, CELL*0.28);
 
-  for (let i = len - 1; i >= 0; i--) {
+  for (let i = len-1; i >= 0; i--) {
     const curr = snake[i];
     const prev = prevSnake[i] || curr;
-    const px = (prev.x + (curr.x - prev.x) * t) * CELL + pad;
-    const py = (prev.y + (curr.y - prev.y) * t) * CELL + pad;
-    const sw = CELL - pad * 2;
-
-    if (i === 0) {
-      ctx.fillStyle = alive ? "#00ff88" : "#ff4444";
-    } else {
-      const fade = 1 - (i / len) * 0.72;
-      ctx.fillStyle = `rgb(0,${Math.floor(220*fade)},${Math.floor(90*fade)})`;
+    let lx = prev.x, ly = prev.y;
+    if (chal.wrap) {
+      if (Math.abs(curr.x-prev.x) > 1) lx = curr.x;
+      if (Math.abs(curr.y-prev.y) > 1) ly = curr.y;
     }
+    const px = (lx + (curr.x-lx)*t)*CELL + pad;
+    const py = (ly + (curr.y-ly)*t)*CELL + pad;
+    const sw = CELL - pad*2;
+
+    ctx.fillStyle = i===0 ? (alive ? skin.head : skin.dead) : skin.body(1-(i/len)*0.72);
     rr(px, py, sw, sw, brad);
 
+    // блик — эффект чешуи
+    ctx.fillStyle = 'rgba(255,255,255,0.13)';
+    rr(px+sw*0.1, py+sw*0.08, sw*0.8, sw*0.35, brad*0.6);
+
     // глаза
-    if (i === 0 && alive && CELL >= 10) {
-      const hx = px + sw/2, hy = py + sw/2;
-      const eo = sw * 0.24, er = Math.max(1.5, sw * 0.11), ep = er * 0.45;
-      let ex1, ey1, ex2, ey2;
-      if      (dir.x ===  1) { ex1=hx+eo*0.6; ey1=hy-eo; ex2=hx+eo*0.6; ey2=hy+eo; }
-      else if (dir.x === -1) { ex1=hx-eo*0.6; ey1=hy-eo; ex2=hx-eo*0.6; ey2=hy+eo; }
-      else if (dir.y === -1) { ex1=hx-eo; ey1=hy-eo*0.6; ex2=hx+eo; ey2=hy-eo*0.6; }
-      else                   { ex1=hx-eo; ey1=hy+eo*0.6; ex2=hx+eo; ey2=hy+eo*0.6; }
-      ctx.fillStyle = "#e8ffe8";
-      ctx.beginPath(); ctx.arc(ex1, ey1, er, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex2, ey2, er, 0, Math.PI*2); ctx.fill();
-      ctx.fillStyle = "#0a1a0a";
-      ctx.beginPath(); ctx.arc(ex1, ey1, ep, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ex2, ey2, ep, 0, Math.PI*2); ctx.fill();
+    if (i===0 && alive && CELL>=10) {
+      const hx=px+sw/2, hy=py+sw/2;
+      const eo=sw*0.24, er=Math.max(1.5,sw*0.11), ep=er*0.42;
+      let ex1,ey1,ex2,ey2;
+      if      (dir.x=== 1){ex1=hx+eo*0.6;ey1=hy-eo;ex2=hx+eo*0.6;ey2=hy+eo;}
+      else if (dir.x===-1){ex1=hx-eo*0.6;ey1=hy-eo;ex2=hx-eo*0.6;ey2=hy+eo;}
+      else if (dir.y===-1){ex1=hx-eo;ey1=hy-eo*0.6;ex2=hx+eo;ey2=hy-eo*0.6;}
+      else                {ex1=hx-eo;ey1=hy+eo*0.6;ex2=hx+eo;ey2=hy+eo*0.6;}
+      ctx.fillStyle='#f0fff0';
+      ctx.beginPath();ctx.arc(ex1,ey1,er,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(ex2,ey2,er,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#0a0a0a';
+      ctx.beginPath();ctx.arc(ex1,ey1,ep,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(ex2,ey2,ep,0,Math.PI*2);ctx.fill();
     }
+  }
+
+  // полоска таймера (Блиц)
+  if (chal.timeLimit > 0 && alive) {
+    const pct = timeLeft / chal.timeLimit;
+    ctx.fillStyle = pct > 0.3 ? 'rgba(255,255,0,0.2)' : 'rgba(255,50,50,0.25)';
+    ctx.fillRect(0, canvas.height-4, canvas.width*pct, 4);
   }
 }
 
@@ -283,111 +404,131 @@ function gameLoop(ts) {
   if (elapsed >= TICK_MS) {
     lastTickTime = ts - (elapsed % TICK_MS);
     step();
-    drawFrameInterp((elapsed % TICK_MS) / TICK_MS); // рисуем сразу после шага
+    drawFrameInterp((elapsed % TICK_MS) / TICK_MS);
   } else {
     drawFrameInterp(elapsed / TICK_MS);
   }
 }
 
 function step() {
-  prevSnake = snake.map(s => ({ ...s }));
+  prevSnake = snake.map(s => ({...s}));
   dir = nextDir;
-  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-
-  if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS ||
-      snake.some(s => s.x === head.x && s.y === head.y)) {
-    alive = false;
-    cancelAnimationFrame(rafId);
-    tg?.HapticFeedback?.notificationOccurred("error");
-    const nb = Math.max(best, score);
-    if (nb > best) { best = nb; localStorage.setItem("snake_best", best); }
-    document.getElementById("best").textContent = best;
-    submitScore(score);
-    drawFrameInterp(1);
-    showGameOver();
-    return;
+  const chal = CHALLENGES[curChallenge];
+  let nx = snake[0].x + dir.x;
+  let ny = snake[0].y + dir.y;
+  if (chal.wrap) { nx=(nx+COLS)%COLS; ny=(ny+ROWS)%ROWS; }
+  const head = {x:nx, y:ny};
+  if ((!chal.wrap && (nx<0||nx>=COLS||ny<0||ny>=ROWS)) || snake.some(s=>s.x===head.x&&s.y===head.y)) {
+    endGame(); return;
   }
-
   snake.unshift(head);
-  if (head.x === food.x && head.y === food.y) {
+  if (head.x===food.x && head.y===food.y) {
     score++;
     document.getElementById("score").textContent = score;
     food = spawnFood();
-    prevSnake.unshift(prevSnake[0] || head);
+    prevSnake.unshift(prevSnake[0]||head);
     tg?.HapticFeedback?.impactOccurred("light");
-  } else {
-    snake.pop();
-  }
+  } else { snake.pop(); }
+}
+
+function endGame() {
+  alive = false;
+  cancelAnimationFrame(rafId);
+  clearInterval(timerInterval);
+  tg?.HapticFeedback?.notificationOccurred("error");
+  const nb = Math.max(best, score);
+  if (nb > best) { best=nb; localStorage.setItem("snake_best", best); }
+  document.getElementById("best").textContent = best;
+  submitScore(score);
+  drawFrameInterp(1);
+  showGameOver();
 }
 
 function startGame() {
   document.getElementById("overlay").style.display = "none";
   showTab("game");
   cancelAnimationFrame(rafId);
-  snake     = [{ x: 10, y: 10 }];
-  prevSnake = [{ x: 10, y: 10 }];
-  food      = spawnFood();
-  dir       = { x: 1, y: 0 };
-  nextDir   = { x: 1, y: 0 };
-  score     = 0;
-  alive     = true;
-  lastTickTime = 0;
+  clearInterval(timerInterval);
+  const chal = CHALLENGES[curChallenge];
+  TICK_MS = chal.tickMs;
+  snake=[{x:10,y:10}]; prevSnake=[{x:10,y:10}];
+  food=spawnFood(); dir={x:1,y:0}; nextDir={x:1,y:0};
+  score=0; alive=true; lastTickTime=0;
   document.getElementById("score").textContent = 0;
+  const timerEl = document.getElementById("timer-display");
+  if (chal.timeLimit > 0) {
+    timeLeft = chal.timeLimit;
+    timerEl.style.display = "inline";
+    timerEl.textContent = "⏱ "+timeLeft+"с";
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = "⏱ "+timeLeft+"с";
+      if (timeLeft<=0 && alive) endGame();
+    }, 1000);
+  } else { timerEl.style.display="none"; timeLeft=0; }
   drawFrameInterp(1);
   rafId = requestAnimationFrame(gameLoop);
 }
 
 function showGameOver() {
+  const chalLabel = {classic:'🐍 Классика',sprint:'⚡ Спринт',wrap:'🌀 Без стен',blitz:'⏱ Блиц'}[curChallenge];
   const ov = document.getElementById("overlay");
   ov.innerHTML = `
     <h1>💀 КОНЕЦ</h1>
-    <div class="sub">Счёт: ${score}</div>
-    ${score > 0 && score >= best ? '<div class="rec">🎉 Новый рекорд!</div>' : ''}
-    <button onclick="startGame()">ЕЩЁ РАЗ</button>
-    <button style="background:#111;color:#0f0;border:2px solid #0f0;margin-top:2px"
-      onclick="showTab('lb');document.getElementById('overlay').style.display='none'">
-      🏅 Посмотреть топ
-    </button>
+    <div class="sub">Счёт: ${score} &nbsp;|&nbsp; ${chalLabel}</div>
+    ${score>0&&score>=best?'<div class="rec">🎉 Новый рекорд!</div>':''}
+    <div style="color:#888;font-size:11px;letter-spacing:2px;margin-top:6px">СКИН ЗМЕЙКИ</div>
+    <div class="skin-row">
+      <div class="skin-btn ${curSkin==='green'?'active':''}" data-skin="green" onclick="setSkin('green')"></div>
+      <div class="skin-btn ${curSkin==='fire'?'active':''}"  data-skin="fire"  onclick="setSkin('fire')"></div>
+      <div class="skin-btn ${curSkin==='ice'?'active':''}"   data-skin="ice"   onclick="setSkin('ice')"></div>
+    </div>
+    <div style="color:#888;font-size:11px;letter-spacing:2px;margin-top:4px">РЕЖИМ</div>
+    <div class="challenge-grid">
+      <button class="chal-btn ${curChallenge==='classic'?'active':''}" data-chal="classic" onclick="setChallenge('classic')"><span class="chal-icon">🐍</span>КЛАССИКА</button>
+      <button class="chal-btn ${curChallenge==='sprint'?'active':''}"  data-chal="sprint"  onclick="setChallenge('sprint')"><span class="chal-icon">⚡</span>СПРИНТ</button>
+      <button class="chal-btn ${curChallenge==='wrap'?'active':''}"    data-chal="wrap"    onclick="setChallenge('wrap')"><span class="chal-icon">🌀</span>БЕЗ СТЕН</button>
+      <button class="chal-btn ${curChallenge==='blitz'?'active':''}"   data-chal="blitz"   onclick="setChallenge('blitz')"><span class="chal-icon">⏱</span>БЛИЦ 60с</button>
+    </div>
+    <button class="play-btn" onclick="startGame()">ЕЩЁ РАЗ</button>
+    <button class="ghost-btn" onclick="showTab('lb');document.getElementById('overlay').style.display='none'">🏅 Посмотреть топ</button>
   `;
   ov.style.display = "flex";
 }
 
-function setDir(dx, dy) {
+function setDir(dx,dy) {
   if (!alive) return;
-  if (snake.length > 1 && dx === -dir.x && dy === -dir.y) return;
-  nextDir = { x: dx, y: dy };
+  if (snake.length>1 && dx===-dir.x && dy===-dir.y) return;
+  nextDir={x:dx,y:dy};
 }
 
 document.querySelectorAll("#dpad button").forEach(btn => {
-  const map = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] };
-  const [dx, dy] = map[btn.dataset.d];
-  btn.addEventListener("pointerdown", e => { e.preventDefault(); setDir(dx, dy); });
+  const map={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+  const [dx,dy]=map[btn.dataset.d];
+  btn.addEventListener("pointerdown",e=>{e.preventDefault();setDir(dx,dy);});
 });
 
-document.addEventListener("keydown", e => {
-  const map = { ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0], w:[0,-1], s:[0,1], a:[-1,0], d:[1,0] };
-  if (map[e.key]) { e.preventDefault(); setDir(...map[e.key]); }
+document.addEventListener("keydown",e=>{
+  const map={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+  if(map[e.key]){e.preventDefault();setDir(...map[e.key]);}
 });
 
-// Свайпы по всему экрану (кроме кнопок)
-document.addEventListener("touchstart", e => {
-  if (e.target.closest("#dpad")) return;
-  touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-}, { passive: true });
+document.addEventListener("touchstart",e=>{
+  if(e.target.closest("#dpad")) return;
+  touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+},{passive:true});
 
-document.addEventListener("touchend", e => {
-  if (!touchStart) return;
-  if (e.target.closest("#dpad")) return;
-  const dx = e.changedTouches[0].clientX - touchStart.x;
-  const dy = e.changedTouches[0].clientY - touchStart.y;
-  touchStart = null;
-  if (Math.abs(dx) < 15 && Math.abs(dy) < 15) return;
-  Math.abs(dx) > Math.abs(dy) ? setDir(dx > 0 ? 1 : -1, 0) : setDir(0, dy > 0 ? 1 : -1);
+document.addEventListener("touchend",e=>{
+  if(!touchStart||e.target.closest("#dpad")) return;
+  const dx=e.changedTouches[0].clientX-touchStart.x;
+  const dy=e.changedTouches[0].clientY-touchStart.y;
+  touchStart=null;
+  if(Math.abs(dx)<15&&Math.abs(dy)<15) return;
+  Math.abs(dx)>Math.abs(dy)?setDir(dx>0?1:-1,0):setDir(0,dy>0?1:-1);
   tg?.HapticFeedback?.selectionChanged();
-}, { passive: true });
+},{passive:true});
 
 drawFrame();
 </script>
-
 </body>
 </html>
