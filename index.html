@@ -7,7 +7,6 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       background: #000;
       display: flex;
@@ -20,78 +19,47 @@
       overflow: hidden;
       user-select: none;
     }
-
-    #tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 10px;
-    }
+    #tabs { display: flex; gap: 0; margin-bottom: 10px; }
     #tabs button {
-      flex: 1;
-      padding: 6px 20px;
-      background: #111;
-      border: 2px solid #0f0;
-      color: #0f0;
-      font-family: inherit;
-      font-size: 13px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: background 0.1s;
+      flex: 1; padding: 6px 20px;
+      background: #111; border: 2px solid #0f0; color: #0f0;
+      font-family: inherit; font-size: 13px; letter-spacing: 1px;
+      cursor: pointer; transition: background 0.1s;
     }
     #tabs button:first-child { border-radius: 6px 0 0 6px; border-right: none; }
     #tabs button:last-child  { border-radius: 0 6px 6px 0; }
     #tabs button.active { background: #0f0; color: #000; font-weight: bold; }
-
     #scoreboard {
-      display: flex;
-      gap: 32px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      letter-spacing: 2px;
+      display: flex; gap: 32px; margin-bottom: 10px;
+      font-size: 13px; letter-spacing: 2px;
     }
     #scoreboard span { color: #fff; font-size: 16px; font-weight: bold; }
-
     canvas {
-      background: #111;
-      border: 2px solid #0f0;
-      display: block;
-      touch-action: none;
+      background: #111; border: 2px solid #0f0;
+      display: block; touch-action: none;
     }
-
     #dpad {
       display: grid;
       grid-template-areas: ". up ." "left . right" ". down .";
-      gap: 8px;
-      margin-top: 14px;
+      gap: 8px; margin-top: 14px;
     }
     #dpad button {
       width: 68px; height: 68px;
-      background: #0d1f0d;
-      border: 2px solid #00cc44;
-      color: #00ff66;
-      font-size: 26px;
-      cursor: pointer;
-      border-radius: 14px;
+      background: #0d1f0d; border: 2px solid #00cc44; color: #00ff66;
+      font-size: 26px; cursor: pointer; border-radius: 14px;
       -webkit-tap-highlight-color: transparent;
       box-shadow: 0 0 8px rgba(0,255,80,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
       transition: background 0.08s, box-shadow 0.08s;
     }
-    #dpad button:active {
-      background: #00cc44;
-      color: #000;
-      box-shadow: 0 0 18px rgba(0,255,80,0.55);
-    }
+    #dpad button:active { background: #00cc44; color: #000; box-shadow: 0 0 18px rgba(0,255,80,0.55); }
     #dpad button[data-d="up"]    { grid-area: up; }
     #dpad button[data-d="left"]  { grid-area: left; }
     #dpad button[data-d="right"] { grid-area: right; }
     #dpad button[data-d="down"]  { grid-area: down; }
-
     #overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.85);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 12px;
+      align-items: center; justify-content: center; gap: 12px;
     }
     #overlay h1 { font-size: 34px; color: #0f0; letter-spacing: 4px; }
     #overlay .sub { font-size: 18px; color: #fff; }
@@ -103,25 +71,15 @@
       letter-spacing: 2px; cursor: pointer; border-radius: 6px;
     }
     #overlay button:active { opacity: 0.8; }
-
     #lb-panel {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 340px;
-      gap: 6px;
+      display: none; flex-direction: column; align-items: center;
+      width: 100%; max-width: 340px; gap: 6px;
     }
     #lb-panel h2 { font-size: 18px; letter-spacing: 3px; margin-bottom: 4px; }
     .lb-row {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      padding: 7px 14px;
-      background: #111;
-      border: 1px solid #0f0;
-      border-radius: 4px;
-      font-size: 14px;
+      width: 100%; display: flex; justify-content: space-between;
+      padding: 7px 14px; background: #111; border: 1px solid #0f0;
+      border-radius: 4px; font-size: 14px;
     }
     .lb-row .lb-rank { color: #ff0; width: 28px; }
     .lb-row .lb-name { flex: 1; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -167,7 +125,6 @@
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
-// ▼▼▼ адрес твоего Replit-сервера ▼▼▼
 const API = "https://f141608d-1c6f-48a7-b475-76bfe617af45-00-bg39mkj1p2mv.sisko.replit.dev/api";
 
 const canvas = document.getElementById("game");
@@ -181,8 +138,6 @@ const TICK_MS = 190;
 best = Number(localStorage.getItem("snake_best") || 0);
 document.getElementById("best").textContent = best;
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-
 function showTab(tab) {
   const tabs = document.querySelectorAll("#tabs button");
   const gp = document.getElementById("game-panel");
@@ -194,8 +149,6 @@ function showTab(tab) {
   tabs[1].classList.toggle("active", tab === "lb");
   if (tab === "lb") loadLeaderboard();
 }
-
-// ── Leaderboard ───────────────────────────────────────────────────────────────
 
 async function loadLeaderboard() {
   const panel = document.getElementById("lb-panel");
@@ -238,8 +191,6 @@ async function submitScore(s) {
   } catch {}
 }
 
-// ── Canvas ────────────────────────────────────────────────────────────────────
-
 function resize() {
   const maxW = Math.min(window.innerWidth  - 16, 380);
   const maxH = Math.min(window.innerHeight - 210, 380);
@@ -257,8 +208,6 @@ function spawnFood() {
   }
   return { x: 0, y: 0 };
 }
-
-// ── Render ────────────────────────────────────────────────────────────────────
 
 function drawGrid() {
   ctx.strokeStyle = "rgba(0,255,0,0.06)";
@@ -282,7 +231,6 @@ function drawFrameInterp(t) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   drawGrid();
 
-  // food — glowing circle
   const fc = { x: food.x * CELL + CELL/2, y: food.y * CELL + CELL/2 };
   const fr = CELL / 2 - 2;
   ctx.shadowColor = "#ff2244";
@@ -293,7 +241,6 @@ function drawFrameInterp(t) {
   ctx.fillStyle   = "rgba(255,220,220,0.55)";
   ctx.beginPath(); ctx.arc(fc.x - fr*0.28, fc.y - fr*0.32, fr*0.32, 0, Math.PI*2); ctx.fill();
 
-  // snake
   const len  = snake.length;
   const pad  = Math.max(1, CELL * 0.08);
   const brad = Math.max(3, CELL * 0.28);
@@ -313,28 +260,19 @@ function drawFrameInterp(t) {
     } else {
       ctx.shadowBlur = 0;
       const fade = 1 - (i / len) * 0.72;
-      const g = Math.floor(220 * fade);
-      const b = Math.floor(90 * fade);
-      ctx.fillStyle = `rgb(0,${g},${b})`;
+      ctx.fillStyle = `rgb(0,${Math.floor(220*fade)},${Math.floor(90*fade)})`;
     }
-
     rr(px, py, sw, sw, brad);
 
-    // eyes on head
     if (i === 0 && alive && CELL >= 10) {
       ctx.shadowBlur = 0;
-      const hx = px + sw / 2;
-      const hy = py + sw / 2;
-      const eo = sw * 0.24;
-      const er = Math.max(1.5, sw * 0.11);
-      const ep = er * 0.45;
-
+      const hx = px + sw/2, hy = py + sw/2;
+      const eo = sw * 0.24, er = Math.max(1.5, sw * 0.11), ep = er * 0.45;
       let ex1, ey1, ex2, ey2;
       if      (dir.x ===  1) { ex1=hx+eo*0.6; ey1=hy-eo; ex2=hx+eo*0.6; ey2=hy+eo; }
       else if (dir.x === -1) { ex1=hx-eo*0.6; ey1=hy-eo; ex2=hx-eo*0.6; ey2=hy+eo; }
       else if (dir.y === -1) { ex1=hx-eo; ey1=hy-eo*0.6; ex2=hx+eo; ey2=hy-eo*0.6; }
       else                   { ex1=hx-eo; ey1=hy+eo*0.6; ex2=hx+eo; ey2=hy+eo*0.6; }
-
       ctx.fillStyle = "#e8ffe8";
       ctx.beginPath(); ctx.arc(ex1, ey1, er, 0, Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc(ex2, ey2, er, 0, Math.PI*2); ctx.fill();
@@ -348,8 +286,6 @@ function drawFrameInterp(t) {
 
 function drawFrame() { drawFrameInterp(1); }
 
-// ── Game loop ─────────────────────────────────────────────────────────────────
-
 function gameLoop(ts) {
   if (!alive) return;
   rafId = requestAnimationFrame(gameLoop);
@@ -361,8 +297,6 @@ function gameLoop(ts) {
     drawFrameInterp(elapsed / TICK_MS);
   }
 }
-
-// ── Game logic ────────────────────────────────────────────────────────────────
 
 function step() {
   prevSnake = snake.map(s => ({ ...s }));
@@ -393,7 +327,6 @@ function step() {
   } else {
     snake.pop();
   }
-  drawFrameInterp(1);
 }
 
 function startGame() {
@@ -427,8 +360,6 @@ function showGameOver() {
   `;
   ov.style.display = "flex";
 }
-
-// ── Controls ──────────────────────────────────────────────────────────────────
 
 function setDir(dx, dy) {
   if (!alive) return;
